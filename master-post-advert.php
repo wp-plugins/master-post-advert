@@ -174,7 +174,6 @@ class MasterPostAdvert
    */
   public function the_content($content)
   {
-    $this->get_options();
     if (stripos($content, '<span id="more-') === FALSE)
     {
       if (stripos($content, 'more-link') === FALSE)
@@ -188,6 +187,7 @@ class MasterPostAdvert
     }
     else
     {
+      $this->get_options();
       if ($this->options['code'])
       {
         return preg_replace_callback
