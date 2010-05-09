@@ -1,10 +1,10 @@
-=== Master Post Advert ===
+﻿=== Master Post Advert ===
 Contributors: m_i_n
-Donate link: http://www.bbproject.net
+Donate link: http://www.bbproject.net/dotacja
 Tags: advert, advertisement, ad, post, adsense, tradedoubler
 Requires at least: 2.8
 Tested up to: 2.9.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 
 Display advertising between the introduction and post content.
 
@@ -37,6 +37,11 @@ Copyright ©2010 [BBProject.net](http://www.bbproject.net)
 2. Backend - advertisement settings
 
 == Changelog ==
+
+= 1.0.1 =
+* added setting to advertising area alignment
+* advertising is no longer displayed in the RSS feed
+* minor changes
 
 = 1.0.0 =
 * initial release
