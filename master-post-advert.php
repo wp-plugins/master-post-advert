@@ -30,15 +30,24 @@ class MasterPostAdvert
   {
     if ( ! isset($this->options))
     {
+      $default_options = array
+      (
+        'align' => 'none',
+        'title' => '',
+        'width' => 0,
+        'code' => ''
+      );
       $this->options = get_option($this->name);
       if ( ! is_array($this->options))
       {
-        $this->options = array
-        (
-          'title' => '',
-          'width' => 0,
-          'code' => ''
-        );
+        $this->options = array();
+      }
+      foreach ($default_options as $name => $value)
+      {
+        if ( ! isset($this->options[$name]))
+        {
+          $this->options[$name] = $value;
+        }
       }
     }
     return $this->options;
@@ -54,9 +63,16 @@ class MasterPostAdvert
    */
   private function the_content_preg_callback($matches)
   {
+    switch ($this->options['align'])
+    {
+      case 'left':   $margin = 'margin:10px auto 10px 0px;'; break;
+      case 'center': $margin = 'margin:10px auto;'; break;
+      case 'right':  $margin = 'margin:10px 0px 10px auto;'; break;
+      default:       $margin = 'margin:10px 0px;';
+    }
     $width = $this->options['width'] > 0 ? " width:{$this->options['width']}px;" : '';
     $ad =
-      "<div class=\"{$this->name}\" style=\"margin:10px auto;{$width}\">\n".
+      "<div class=\"{$this->name}\" style=\"{$margin}{$width}\">\n".
         "<div>{$this->options['title']}</div>\n".
         "{$this->options['code']}\n".
       "</div>";
@@ -69,7 +85,7 @@ class MasterPostAdvert
     {
       return $ad."\n".$open_tag.$more_tag;
     }
-      else if ($close_tag)
+    else if ($close_tag)
     {
       return $more_tag.$close_tag."\n".$ad;
     }
@@ -129,6 +145,7 @@ class MasterPostAdvert
    */
   public function validate($data)
   {
+    $data['align'] = trim(strtolower($data['align']));
     $data['title'] = trim($data['title']);
     $data['width'] = (integer)$data['width'];
     $data['code'] = trim($data['code']);

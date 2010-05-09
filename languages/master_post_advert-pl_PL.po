@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Master Post Advert\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-26 23:02+0100\n"
+"POT-Creation-Date: 2010-05-09 11:58+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: www.bbproject.net <master@bbproject.net>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../master-post-advert.php:107
+#: ../master-post-advert.php:123
 #: ../options.php:2
 msgid "Master Post Advert Settings"
 msgstr "Ustawienia Master Post Advert"
@@ -26,26 +26,30 @@ msgid "Settings of Your ad"
 msgstr "Ustawienia Twojej reklamy"
 
 #: ../options.php:9
+msgid "Advert area alignment"
+msgstr "Wyrównanie obszaru reklamy"
+
+#: ../options.php:20
 msgid "Advert area title"
 msgstr "Tytuł obszaru reklamy"
 
-#: ../options.php:10
+#: ../options.php:21
 msgid "HTML enabled"
 msgstr "HTML dozwolony"
 
-#: ../options.php:13
+#: ../options.php:24
 msgid "Advert area width"
 msgstr "Szerokość obszaru reklamy"
 
-#: ../options.php:14
+#: ../options.php:25
 msgid "automatic"
 msgstr "automatycznie"
 
-#: ../options.php:17
+#: ../options.php:28
 msgid "Advert code"
 msgstr "Kod reklamy"
 
-#: ../options.php:22
+#: ../options.php:33
 msgid "Save Changes"
 msgstr ""
 
