@@ -71,10 +71,10 @@ class MasterPostAdvert
       default:       $margin = 'margin:10px 0px;';
     }
     $width = $this->options['width'] > 0 ? " width:{$this->options['width']}px;" : '';
+    $title = $this->options['title'] ? "<div>{$this->options['title']}</div>\n" : '';
     $ad =
       "<div class=\"{$this->name}\" style=\"{$margin}{$width}\">\n".
-        "<div>{$this->options['title']}</div>\n".
-        "{$this->options['code']}\n".
+        $title.$this->options['code']."\n".
       "</div>";
     list($all, $open_tag, $more_tag, $close_tag) = $matches;
     if ($open_tag && $close_tag)
@@ -174,7 +174,11 @@ class MasterPostAdvert
    */
   public function the_content($content)
   {
-    if (stripos($content, '<span id="more-') === FALSE)
+    if (is_feed())
+    {
+      return $content;
+    }
+    else if (stripos($content, '<span id="more-') === FALSE)
     {
       if (stripos($content, 'more-link') === FALSE)
       {
