@@ -4,7 +4,7 @@ Donate link: http://www.bbproject.net/dotacja
 Tags: advert, advertisement, ad, post, adsense, tradedoubler
 Requires at least: 2.8
 Tested up to: 2.9.2
-Stable tag: 1.0.2
+Stable tag: 1.0.1
 
 Display advertising between the introduction and post content.
 
@@ -37,9 +37,6 @@ Copyright ©2010 [BBProject.net](http://www.bbproject.net)
 2. Backend - advertisement settings
 
 == Changelog ==
-
-= 1.0.2 =
-* version bug fix
 
 = 1.0.1 =
 * added setting to advertising area alignment
