@@ -3,9 +3,9 @@
  * Plugin Name: Master Post Advert
  * Plugin URI:  http://www.bbproject.net/moje-projekty/inne/master-post-advert
  * Description: Display advertising between the introduction and post content.
- * Author:      M@ster
- * Version:     1.0.1
+ * Author:      BBPROJECT.NET
  * Author URI:  http://www.bbproject.net
+ * Version:     1.0.1
  */
 
 // -----------------------------------------------------------------------------

@@ -3,7 +3,7 @@ Contributors: m_i_n
 Donate link: http://www.bbproject.net/dotacja
 Tags: advert, advertisement, ad, post, adsense, tradedoubler
 Requires at least: 2.8
-Tested up to: 2.9.2
+Tested up to: 4.0
 Stable tag: 1.0.1
 
 Display advertising between the introduction and post content.
@@ -23,7 +23,7 @@ Master Post Advert ia a simple plugin that display advertising between the intro
 
 = About =
 
-Copyright ©2010 [BBProject.net](http://www.bbproject.net)
+Copyright ©2010 [BBPROJECT.NET](http://www.bbproject.net)
 
 == Installation ==
 
