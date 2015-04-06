@@ -12,7 +12,7 @@
 					<th scope="row"><?php _e('Advert area alignment', $this->name); ?></th>
 					<td>
 						<fieldset>
-							<?php foreach(array('none', 'left', 'center', 'right') as $align): ?>
+							<?php foreach(array('left', 'center', 'right') as $align): ?>
 								<label>
 									<input type="radio" name="master_post_advert[align]" value="<?php echo $align; ?>"<?php if ($align == $options['align']) echo ' checked'; ?> />
 									<span><?php _e(ucfirst($align)); ?></span>
@@ -26,13 +26,6 @@
 					<td>
 						<input type="text" name="master_post_advert[title]" value="<?php echo htmlspecialchars($options['title']); ?>" class="regular-text code" />
 						<p class="description"><?php _e('HTML enabled.', $this->name); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><?php _e('Advert area width', $this->name); ?></th>
-					<td>
-						<input type="number" name="master_post_advert[width]" value="<?php echo $options['width']; ?>" min="0" class="small-text" /> px
-						<p class="description"><code>0</code> = <?php _e('automatic.', $this->name); ?></p>
 					</td>
 				</tr>
 				<tr>

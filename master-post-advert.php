@@ -13,13 +13,13 @@
 class MasterPostAdvert
 {
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	private $name       = 'master_post_advert';
 	private $plugin_dir = '';
 	private $options;
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Pobranie ustawien
@@ -32,9 +32,8 @@ class MasterPostAdvert
 		if (!isset($this->options)) {
 
 			$default_options = array(
-				'align' => 'none',
+				'align' => 'center',
 				'title' => '',
-				'width' => 0,
 				'code'  => ''
 			);
 			$this->options = get_option($this->name);
@@ -54,22 +53,29 @@ class MasterPostAdvert
 
 	}
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Konstruktor
 	 *
-	 * return void
+	 * @return void
 	 */
 	public function __construct()
 	{
+
 		$this->plugin_dir = WP_PLUGIN_DIR.'/'.str_replace(basename(__FILE__), '', plugin_basename(__FILE__));
 		load_plugin_textdomain($this->name, false, str_replace(WP_PLUGIN_DIR, '', $this->plugin_dir).'languages');
-		add_action('admin_menu', array($this, 'actionAdminMenu'));
-		add_filter('the_content', array($this, 'filterTheContent'));
+
+		if (is_admin()) {
+			add_action('admin_menu', array($this, 'actionAdminMenu'));
+		} else {
+			add_filter('the_content_more_link', array($this, 'filterTheContentMoreLink'));
+			add_filter('the_content', array($this, 'filterTheContent'));
+		}
+
 	}
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Zdarzenie
@@ -82,7 +88,7 @@ class MasterPostAdvert
 		add_options_page(__('Master Post Advert Settings', $this->name), 'Master Post Advert', 'install_plugins', basename(__FILE__), array($this, 'callbackOptions'));
 	}
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Zdarzenie
@@ -94,7 +100,7 @@ class MasterPostAdvert
 		register_setting($this->name.'_options', $this->name, array($this, 'callbackValidate'));
 	}
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Formularz ustawien
@@ -107,7 +113,7 @@ class MasterPostAdvert
 		include $this->plugin_dir.'options.php';
 	}
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Walidacja danych formularza ustawien
@@ -119,12 +125,26 @@ class MasterPostAdvert
 	{
 		$data['align'] = trim(strtolower($data['align']));
 		$data['title'] = trim($data['title']);
-		$data['width'] = (int)$data['width'];
 		$data['code']  = trim($data['code']);
 		return $data;
 	}
 
-	// ---------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Usuniecie anchora linka "Czytaj wiecej"
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param  string $more_link_html
+	 * @return string
+	 */
+	public function filterTheContentMoreLink($more_link_html)
+	{
+		return preg_replace('/#more-[0-9]+/i', '', $more_link_html);
+	}
+
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Parsowanie tresci
@@ -135,55 +155,41 @@ class MasterPostAdvert
 	public function filterTheContent($content)
 	{
 
-		if (is_feed()) {
-
+		// Nie jest postem
+		if (!is_single()) {
 			return $content;
-
-		} else if (stripos($content, '<span id="more-') === false) {
-
-			if (stripos($content, 'more-link') === false) {
-				return $content;
-			} else {
-				return preg_replace('/#more-[0-9]+/i', '', $content);
-			}
-
-		} else {
-
-			$options = $this->getOptions();
-			if ($this->options['code']) {
-				return preg_replace_callback(
-					'/(<[a-z0-9]+.*?>)?(<span id="more-[0-9]+"><\/span>)(<\/[a-z0-9]+>)?/i',
-					function($matches) use ($options) {
-						switch ($options['align']) {
-							case 'left':   $margin = 'margin: 10px auto 10px 0px;'; break;
-							case 'center': $margin = 'margin: 10px auto;'; break;
-							case 'right':  $margin = 'margin: 10px 0px 10px auto;'; break;
-							default:       $margin = 'margin: 10px 0px;';
-						}
-						$width = $options['width'] > 0 ? " width:{$options['width']}px;" : '';
-						$title = $options['title'] ? "<div>{$options['title']}</div>\n" : '';
-						$ad =
-							"<div class=\"master_post_advert\" style=\"{$margin}{$width}\">\n".
-								$title.$options['code']."\n".
-							"</div>";
-						list($all, $open_tag, $more_tag, $close_tag) = $matches;
-						if ($open_tag && $close_tag) {
-							return $ad."\n".$all;
-						} else if ($open_tag) {
-							return $ad."\n".$open_tag.$more_tag;
-						} else if ($close_tag) {
-							return $more_tag.$close_tag."\n".$ad;
-						} else {
-							return "\n".$ad."\n".$more_tag;
-						}
-					},
-					$content
-				);
-			} else {
-				return $content;
-			}
-
 		}
+
+		// Brak kodu reklamy
+		$options = $this->getOptions();
+		if (!$this->options['code']) {
+			return $content;
+		}
+
+		return preg_replace_callback(
+			'#(?P<open><([a-z]+)[^>]*>)?(?P<more><span id="more-[0-9]+"></span>)(?P<close></\2>)?#i',
+			function($m) use ($options) {
+				$title = $options['title'] ? '<div class="master-post-advert-title">'.$options['title'].'</div>' : '';
+				$ad = <<<"EOA"
+<div class="master-post-advert" style="text-align: {$options['align']}; margin: 25px 0; overflow: hidden;">
+	<div style="text-align: left; display: inline-block; max-width: 100%;">
+		{$title}
+		<div class="master-post-advert-ad">{$options['code']}</div>
+	</div>
+</div>
+EOA;
+				if ($m['open'] && $m['close']) {
+					return "{$ad}\n{$m[0]}";
+				} else if ($m['open']) {
+					return "{$ad}\n{$m['open']}{$m['more']}";
+				} else if ($m['close']) {
+					return "{$m['more']}{$m['close']}\n{$ad}";
+				} else {
+					return "\n{$ad}\n{$m['more']}";
+				}
+			},
+			$content
+		);
 
 	}
 
