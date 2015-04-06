@@ -4,7 +4,7 @@ Donate link: http://www.bbproject.net
 Tags: advert, advertisement, ad, post, adsense, tradedoubler
 Requires at least: 3.0
 Tested up to: 4.2
-Stable tag: 1.0.2
+Stable tag: 1.0.1
 
 Display advertising between the introduction and post content.
 
