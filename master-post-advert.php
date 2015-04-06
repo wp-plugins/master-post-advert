@@ -26,7 +26,7 @@ class MasterPostAdvert
 	 *
 	 * @return array
 	 */
-	private function get_options()
+	private function getOptions()
 	{
 
 		if (!isset($this->options)) {
@@ -57,50 +57,16 @@ class MasterPostAdvert
 	// ---------------------------------------------------------------------------
 
 	/**
-	 * Zamiana znacznika "more" tresci na reklame
-	 *
-	 * @param array $matches
-	 * @return string
-	 */
-	private function the_content_preg_callback($matches)
-	{
-		switch ($this->options['align']) {
-			case 'left':   $margin = 'margin: 10px auto 10px 0px;'; break;
-			case 'center': $margin = 'margin: 10px auto;'; break;
-			case 'right':  $margin = 'margin: 10px 0px 10px auto;'; break;
-			default:       $margin = 'margin: 10px 0px;';
-		}
-		$width = $this->options['width'] > 0 ? " width:{$this->options['width']}px;" : '';
-		$title = $this->options['title'] ? "<div>{$this->options['title']}</div>\n" : '';
-		$ad =
-			"<div class=\"{$this->name}\" style=\"{$margin}{$width}\">\n".
-				$title.$this->options['code']."\n".
-			"</div>";
-		list($all, $open_tag, $more_tag, $close_tag) = $matches;
-		if ($open_tag && $close_tag) {
-			return $ad."\n".$all;
-		} else if ($open_tag) {
-			return $ad."\n".$open_tag.$more_tag;
-		} else if ($close_tag) {
-			return $more_tag.$close_tag."\n".$ad;
-		} else {
-			return "\n".$ad."\n".$more_tag;
-		}
-	}
-
-	// ---------------------------------------------------------------------------
-
-	/**
 	 * Konstruktor
 	 *
 	 * return void
 	 */
 	public function __construct()
 	{
-		$this->plugin_dir = WP_PLUGIN_DIR.'/'.str_replace(basename( __FILE__), '', plugin_basename(__FILE__));
-		load_plugin_textdomain($this->name, FALSE, str_replace(WP_PLUGIN_DIR, '', $this->plugin_dir).'languages');
-		add_action('admin_menu', array($this, 'admin_menu'));
-		add_filter('the_content', array($this, 'the_content'));
+		$this->plugin_dir = WP_PLUGIN_DIR.'/'.str_replace(basename(__FILE__), '', plugin_basename(__FILE__));
+		load_plugin_textdomain($this->name, false, str_replace(WP_PLUGIN_DIR, '', $this->plugin_dir).'languages');
+		add_action('admin_menu', array($this, 'actionAdminMenu'));
+		add_filter('the_content', array($this, 'filterTheContent'));
 	}
 
 	// ---------------------------------------------------------------------------
@@ -110,10 +76,10 @@ class MasterPostAdvert
 	 *
 	 * @return void
 	 */
-	public function admin_menu()
+	public function actionAdminMenu()
 	{
-		add_action('admin_init', array($this, 'admin_init'));
-		add_options_page(__('Master Post Advert Settings', $this->name), 'Master Post Advert', 'install_plugins', basename(__FILE__), array($this, 'options'));
+		add_action('admin_init', array($this, 'actionAdminInit'));
+		add_options_page(__('Master Post Advert Settings', $this->name), 'Master Post Advert', 'install_plugins', basename(__FILE__), array($this, 'callbackOptions'));
 	}
 
 	// ---------------------------------------------------------------------------
@@ -123,26 +89,9 @@ class MasterPostAdvert
 	 *
 	 * @return void
 	 */
-	public function admin_init()
+	public function actionAdminInit()
 	{
-		register_setting($this->name.'_options', $this->name, array($this, 'validate'));
-	}
-
-	// ---------------------------------------------------------------------------
-
-	/**
-	 * Walidacja danych formularza ustawien
-	 *
-	 * @param array $data
-	 * @return array
-	 */
-	public function validate($data)
-	{
-		$data['align'] = trim(strtolower($data['align']));
-		$data['title'] = trim($data['title']);
-		$data['width'] = (integer)$data['width'];
-		$data['code']  = trim($data['code']);
-		return $data;
+		register_setting($this->name.'_options', $this->name, array($this, 'callbackValidate'));
 	}
 
 	// ---------------------------------------------------------------------------
@@ -152,9 +101,27 @@ class MasterPostAdvert
 	 *
 	 * @return void
 	 */
-	public function options()
+	public function callbackOptions()
 	{
+		$options = $this->getOptions();
 		include $this->plugin_dir.'options.php';
+	}
+
+	// ---------------------------------------------------------------------------
+
+	/**
+	 * Walidacja danych formularza ustawien
+	 *
+	 * @param  array $data
+	 * @return array
+	 */
+	public function callbackValidate($data)
+	{
+		$data['align'] = trim(strtolower($data['align']));
+		$data['title'] = trim($data['title']);
+		$data['width'] = (int)$data['width'];
+		$data['code']  = trim($data['code']);
+		return $data;
 	}
 
 	// ---------------------------------------------------------------------------
@@ -162,10 +129,10 @@ class MasterPostAdvert
 	/**
 	 * Parsowanie tresci
 	 *
-	 * @param string $content
+	 * @param  string $content
 	 * @return string
 	 */
-	public function the_content($content)
+	public function filterTheContent($content)
 	{
 
 		if (is_feed()) {
@@ -182,11 +149,34 @@ class MasterPostAdvert
 
 		} else {
 
-			$this->get_options();
+			$options = $this->getOptions();
 			if ($this->options['code']) {
 				return preg_replace_callback(
 					'/(<[a-z0-9]+.*?>)?(<span id="more-[0-9]+"><\/span>)(<\/[a-z0-9]+>)?/i',
-					array($this, 'the_content_preg_callback'),
+					function($matches) use ($options) {
+						switch ($options['align']) {
+							case 'left':   $margin = 'margin: 10px auto 10px 0px;'; break;
+							case 'center': $margin = 'margin: 10px auto;'; break;
+							case 'right':  $margin = 'margin: 10px 0px 10px auto;'; break;
+							default:       $margin = 'margin: 10px 0px;';
+						}
+						$width = $options['width'] > 0 ? " width:{$options['width']}px;" : '';
+						$title = $options['title'] ? "<div>{$options['title']}</div>\n" : '';
+						$ad =
+							"<div class=\"master_post_advert\" style=\"{$margin}{$width}\">\n".
+								$title.$options['code']."\n".
+							"</div>";
+						list($all, $open_tag, $more_tag, $close_tag) = $matches;
+						if ($open_tag && $close_tag) {
+							return $ad."\n".$all;
+						} else if ($open_tag) {
+							return $ad."\n".$open_tag.$more_tag;
+						} else if ($close_tag) {
+							return $more_tag.$close_tag."\n".$ad;
+						} else {
+							return "\n".$ad."\n".$more_tag;
+						}
+					},
 					$content
 				);
 			} else {
@@ -201,18 +191,6 @@ class MasterPostAdvert
 
 // -----------------------------------------------------------------------------
 
-/**
- * Inicjalizacja
- *
- * @global object $master_post_advert
- * @return void
- */
-function master_post_advert_init()
-{
-	global $master_post_advert;
-	$master_post_advert = new MasterPostAdvert();
-}
-
-// -----------------------------------------------------------------------------
-
-add_action('init', 'master_post_advert_init');
+add_action('init', function() {
+	new MasterPostAdvert();
+});

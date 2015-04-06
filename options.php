@@ -5,7 +5,6 @@
 	<form method="post" action="options.php">
 
 		<?php settings_fields($this->name.'_options'); ?>
-		<?php $options = $this->get_options(); ?>
 
 		<table class="form-table">
 			<tbody>
