@@ -5,11 +5,16 @@
  * Description: Display advertising between the introduction and post content.
  * Author:      BBPROJECT.NET
  * Author URI:  http://www.bbproject.net
- * Version:     1.0.1
+ * Version:     1.0.2
  */
 
 // -----------------------------------------------------------------------------
 
+/**
+ * Master Post Advert
+ *
+ * @since 1.0
+ */
 class MasterPostAdvert
 {
 
@@ -24,6 +29,8 @@ class MasterPostAdvert
 	/**
 	 * Pobranie ustawien
 	 *
+	 * @since 1.0
+	 *
 	 * @return array
 	 */
 	private function getOptions()
@@ -31,7 +38,7 @@ class MasterPostAdvert
 
 		if (!isset($this->options)) {
 
-			$default_options = array(
+			$defaults = array(
 				'align' => 'center',
 				'title' => '',
 				'code'  => ''
@@ -41,7 +48,7 @@ class MasterPostAdvert
 			if (!is_array($this->options)) {
 				$this->options = array();
 			}
-			foreach ($default_options as $name => $value) {
+			foreach ($defaults as $name => $value) {
 				if (!isset($this->options[$name])) {
 					$this->options[$name] = $value;
 				}
@@ -58,13 +65,13 @@ class MasterPostAdvert
 	/**
 	 * Konstruktor
 	 *
-	 * @return void
+	 * @since 1.0
 	 */
 	public function __construct()
 	{
 
-		$this->plugin_dir = WP_PLUGIN_DIR.'/'.str_replace(basename(__FILE__), '', plugin_basename(__FILE__));
-		load_plugin_textdomain($this->name, false, str_replace(WP_PLUGIN_DIR, '', $this->plugin_dir).'languages');
+		$this->plugin_dir = plugin_dir_path(__FILE__);
+		load_plugin_textdomain($this->name, false, dirname(plugin_basename(__FILE__)).'/languages');
 
 		if (is_admin()) {
 			add_action('admin_menu', array($this, 'actionAdminMenu'));
@@ -78,9 +85,9 @@ class MasterPostAdvert
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Zdarzenie
+	 * Zdarzenie admin_menu
 	 *
-	 * @return void
+	 * @since 1.0
 	 */
 	public function actionAdminMenu()
 	{
@@ -91,9 +98,9 @@ class MasterPostAdvert
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Zdarzenie
+	 * Zdarzenie admin_init
 	 *
-	 * @return void
+	 * @since 1.0
 	 */
 	public function actionAdminInit()
 	{
@@ -105,7 +112,7 @@ class MasterPostAdvert
 	/**
 	 * Formularz ustawien
 	 *
-	 * @return void
+	 * @since 1.0
 	 */
 	public function callbackOptions()
 	{
@@ -117,6 +124,8 @@ class MasterPostAdvert
 
 	/**
 	 * Walidacja danych formularza ustawien
+	 *
+	 * @since 1.0
 	 *
 	 * @param  array $data
 	 * @return array
@@ -148,6 +157,8 @@ class MasterPostAdvert
 
 	/**
 	 * Parsowanie tresci
+	 *
+	 * @since 1.0
 	 *
 	 * @param  string $content
 	 * @return string
