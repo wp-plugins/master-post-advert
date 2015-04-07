@@ -20,9 +20,9 @@ class MasterPostAdvert
 
 	// -------------------------------------------------------------------------
 
-	private $name       = 'master_post_advert';
-	private $plugin_dir = '';
-	private $options;
+	protected $name       = 'master_post_advert';
+	protected $plugin_dir = '';
+	protected $options;
 
 	// -------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ class MasterPostAdvert
 	 *
 	 * @return array
 	 */
-	private function getOptions()
+	protected function getOptions()
 	{
 
 		if (!isset($this->options)) {
@@ -171,17 +171,34 @@ class MasterPostAdvert
 			return $content;
 		}
 
-		// Brak kodu reklamy
-		$options = $this->getOptions();
-		if (!$this->options['code']) {
-			return $content;
-		}
-
 		return preg_replace_callback(
 			'#(?P<open><([a-z]+)[^>]*>)?(?P<more><span id="more-[0-9]+"></span>)(?P<close></\2>)?#i',
-			function($m) use ($options) {
-				$title = $options['title'] ? '<div class="master-post-advert-title">'.$options['title'].'</div>' : '';
-				$ad = <<<"EOA"
+			array($this, 'filterTheContentCallback'),
+			$content
+		);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Funkcja pomocnicza dla parsowania tresci
+	 *
+	 * @since 1.0
+	 *
+	 * @param  array  $m
+	 * @return string
+	 */
+	protected function filterTheContentCallback($m)
+	{
+
+		$options = $this->getOptions();
+		if (!$options['code']) {
+			return $m[0];
+		}
+
+		$title = $options['title'] ? '<div class="master-post-advert-title">'.$options['title'].'</div>' : '';
+		$ad = <<<EOA
 <div class="master-post-advert" style="text-align: {$options['align']}; margin: 25px 0; overflow: hidden;">
 	<div style="text-align: left; display: inline-block; max-width: 100%;">
 		{$title}
@@ -189,18 +206,16 @@ class MasterPostAdvert
 	</div>
 </div>
 EOA;
-				if ($m['open'] && $m['close']) {
-					return "{$ad}\n{$m[0]}";
-				} else if ($m['open']) {
-					return "{$ad}\n{$m['open']}{$m['more']}";
-				} else if ($m['close']) {
-					return "{$m['more']}{$m['close']}\n{$ad}";
-				} else {
-					return "\n{$ad}\n{$m['more']}";
-				}
-			},
-			$content
-		);
+
+		if ($m['open'] && $m['close']) {
+			return "{$ad}\n{$m[0]}";
+		} else if ($m['open']) {
+			return "{$ad}\n{$m['open']}{$m['more']}";
+		} else if ($m['close']) {
+			return "{$m['more']}{$m['close']}\n{$ad}";
+		} else {
+			return "\n{$ad}\n{$m['more']}";
+		}
 
 	}
 
@@ -208,6 +223,7 @@ EOA;
 
 // -----------------------------------------------------------------------------
 
-add_action('init', function() {
+function master_post_advert_init() {
 	new MasterPostAdvert();
-});
+}
+add_action('init', 'master_post_advert_init');
