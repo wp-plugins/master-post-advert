@@ -172,7 +172,7 @@ class MasterPostAdvert
 		}
 
 		return preg_replace_callback(
-			'#(?P<open><([a-z]+)[^>]*>)?(?P<more><span id="more-[0-9]+"></span>)(?P<close></\2>)?#i',
+			'#(?P<open><[a-z]+[^>]*>)? *(?P<more><span id="more-[0-9]+"></span>) *(?P<close></[a-z]+>)?()#i',
 			array($this, 'filterTheContentCallback'),
 			$content
 		);
