@@ -2,15 +2,15 @@
 Contributors: m_i_n
 Donate link: http://www.bbproject.net
 Tags: advert, advertisement, ad, post, adsense, tradedoubler
-Requires at least: 3.0
+Requires at least: 3.2
 Tested up to: 4.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 Display advertising between the introduction and post content.
 
 == Description ==
 
-Master Post Advert ia a simple plugin that display advertising between the introduction and post content.
+Master Post Advert ia a simple plugin that display advertising between post's beginning and rest of the content (where the "Read More" tag is).
 
 = Available languages =
 
@@ -37,6 +37,11 @@ Copyright ©2010 [BBPROJECT.NET](http://www.bbproject.net)
 2. Backend - advertisement settings
 
 == Changelog ==
+
+= 1.0.2 =
+* added simple responsiveness support
+* all the code refreshed
+* other minor changes and improvements
 
 = 1.0.1 =
 * added setting to advertising area alignment
