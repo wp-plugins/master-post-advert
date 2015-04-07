@@ -1,229 +1,229 @@
 <?php
 /*
-Plugin Name: Master Post Advert
-Plugin URI: http://www.bbproject.net/moje-projekty/inne/master-post-advert
-Description: Display advertising between the introduction and post content.
-Author: M@ster
-Version: 1.0.2
-Author URI: http://www.bbproject.net
-*/
-
-// -----------------------------------------------------------------------------
-
-class MasterPostAdvert
-{
-
-  // ---------------------------------------------------------------------------
-
-  private $name = 'master_post_advert';
-  private $plugin_dir = '';
-  private $options;
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Pobranie ustawien
-   *
-   * @return array
-   */
-  private function get_options()
-  {
-    if ( ! isset($this->options))
-    {
-      $default_options = array
-      (
-        'align' => 'none',
-        'title' => '',
-        'width' => 0,
-        'code' => ''
-      );
-      $this->options = get_option($this->name);
-      if ( ! is_array($this->options))
-      {
-        $this->options = array();
-      }
-      foreach ($default_options as $name => $value)
-      {
-        if ( ! isset($this->options[$name]))
-        {
-          $this->options[$name] = $value;
-        }
-      }
-    }
-    return $this->options;
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Zamiana znacznika "more" tresci na reklame
-   *
-   * @param array $matches
-   * @return string
-   */
-  private function the_content_preg_callback($matches)
-  {
-    switch ($this->options['align'])
-    {
-      case 'left':   $margin = 'margin:10px auto 10px 0px;'; break;
-      case 'center': $margin = 'margin:10px auto;'; break;
-      case 'right':  $margin = 'margin:10px 0px 10px auto;'; break;
-      default:       $margin = 'margin:10px 0px;';
-    }
-    $width = $this->options['width'] > 0 ? " width:{$this->options['width']}px;" : '';
-    $title = $this->options['title'] ? "<div>{$this->options['title']}</div>\n" : '';
-    $ad =
-      "<div class=\"{$this->name}\" style=\"{$margin}{$width}\">\n".
-        $title.$this->options['code']."\n".
-      "</div>";
-    list($all, $open_tag, $more_tag, $close_tag) = $matches;
-    if ($open_tag && $close_tag)
-    {
-      return $ad."\n".$all;
-    }
-    else if ($open_tag)
-    {
-      return $ad."\n".$open_tag.$more_tag;
-    }
-    else if ($close_tag)
-    {
-      return $more_tag.$close_tag."\n".$ad;
-    }
-    else
-    {
-      return "\n".$ad."\n".$more_tag;
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Konstruktor
-   *
-   * return void
-   */
-  public function __construct()
-  {
-    $this->plugin_dir = WP_PLUGIN_DIR.'/'.str_replace(basename( __FILE__), '', plugin_basename(__FILE__));
-    load_plugin_textdomain($this->name, FALSE, str_replace(WP_PLUGIN_DIR, '', $this->plugin_dir).'languages');
-    add_action('admin_menu', array($this, 'admin_menu'));
-    add_filter('the_content', array($this, 'the_content'));
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Zdarzenie
-   *
-   * @return void
-   */
-  public function admin_menu()
-  {
-    add_action('admin_init', array($this, 'admin_init'));
-    add_options_page(__('Master Post Advert Settings', $this->name), 'Master Post Advert', 'install_plugins', basename(__FILE__), array($this, 'options'));
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Zdarzenie
-   *
-   * @return void
-   */
-  public function admin_init()
-  {
-    register_setting($this->name.'_options', $this->name, array($this, 'validate'));
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Walidacja danych formularza ustawien
-   *
-   * @param array $data
-   * @return array
-   */
-  public function validate($data)
-  {
-    $data['align'] = trim(strtolower($data['align']));
-    $data['title'] = trim($data['title']);
-    $data['width'] = (integer)$data['width'];
-    $data['code'] = trim($data['code']);
-    return $data;
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Formularz ustawien
-   *
-   * @return void
-   */
-  public function options()
-  {
-    include $this->plugin_dir.'options.php';
-  }
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Parsowanie tresci
-   *
-   * @param string $content
-   * @return string
-   */
-  public function the_content($content)
-  {
-    if (is_feed())
-    {
-      return $content;
-    }
-    else if (stripos($content, '<span id="more-') === FALSE)
-    {
-      if (stripos($content, 'more-link') === FALSE)
-      {
-        return $content;
-      }
-      else
-      {
-        return preg_replace('/#more-[0-9]+/i', '', $content);
-      }
-    }
-    else
-    {
-      $this->get_options();
-      if ($this->options['code'])
-      {
-        return preg_replace_callback
-        (
-          '/(<[a-z0-9]+.*?>)?(<span id="more-[0-9]+"><\/span>)(<\/[a-z0-9]+>)?/i',
-          array($this, 'the_content_preg_callback'),
-          $content
-        );
-      }
-      else
-      {
-        return $content;
-      }
-    }
-  }
-
-}
+ * Plugin Name: Master Post Advert
+ * Plugin URI:  http://www.bbproject.net/moje-projekty/inne/master-post-advert
+ * Description: Display advertising between the introduction and post content.
+ * Author:      BBPROJECT.NET
+ * Author URI:  http://www.bbproject.net
+ * Version:     1.0.2
+ */
 
 // -----------------------------------------------------------------------------
 
 /**
- * Inicjalizacja
+ * Master Post Advert
  *
- * @global object $master_post_advert
- * @return void
+ * @since 1.0
  */
-function master_post_advert_init()
+class MasterPostAdvert
 {
-  global $master_post_advert;
-	$master_post_advert = new MasterPostAdvert();
+
+	// -------------------------------------------------------------------------
+
+	protected $name       = 'master_post_advert';
+	protected $plugin_dir = '';
+	protected $options;
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Pobranie ustawien
+	 *
+	 * @since 1.0
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+
+		if (!isset($this->options)) {
+
+			$defaults = array(
+				'align' => 'center',
+				'title' => '',
+				'code'  => ''
+			);
+			$this->options = get_option($this->name);
+
+			if (!is_array($this->options)) {
+				$this->options = array();
+			}
+			foreach ($defaults as $name => $value) {
+				if (!isset($this->options[$name])) {
+					$this->options[$name] = $value;
+				}
+			}
+
+		}
+
+		return $this->options;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Konstruktor
+	 *
+	 * @since 1.0
+	 */
+	public function __construct()
+	{
+
+		$this->plugin_dir = plugin_dir_path(__FILE__);
+		load_plugin_textdomain($this->name, false, dirname(plugin_basename(__FILE__)).'/languages');
+
+		if (is_admin()) {
+			add_action('admin_menu', array($this, 'actionAdminMenu'));
+		} else {
+			add_filter('the_content_more_link', array($this, 'filterTheContentMoreLink'));
+			add_filter('the_content', array($this, 'filterTheContent'));
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Zdarzenie admin_menu
+	 *
+	 * @since 1.0
+	 */
+	public function actionAdminMenu()
+	{
+		add_action('admin_init', array($this, 'actionAdminInit'));
+		add_options_page(__('Master Post Advert Settings', $this->name), 'Master Post Advert', 'install_plugins', basename(__FILE__), array($this, 'callbackOptions'));
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Zdarzenie admin_init
+	 *
+	 * @since 1.0
+	 */
+	public function actionAdminInit()
+	{
+		register_setting($this->name.'_options', $this->name, array($this, 'callbackValidate'));
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Formularz ustawien
+	 *
+	 * @since 1.0
+	 */
+	public function callbackOptions()
+	{
+		$options = $this->getOptions();
+		include $this->plugin_dir.'options.php';
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Walidacja danych formularza ustawien
+	 *
+	 * @since 1.0
+	 *
+	 * @param  array $data
+	 * @return array
+	 */
+	public function callbackValidate($data)
+	{
+		$data['align'] = trim(strtolower($data['align']));
+		$data['title'] = trim($data['title']);
+		$data['code']  = trim($data['code']);
+		return $data;
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Usuniecie anchora linka "Czytaj wiecej"
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param  string $more_link_html
+	 * @return string
+	 */
+	public function filterTheContentMoreLink($more_link_html)
+	{
+		return preg_replace('/#more-[0-9]+/i', '', $more_link_html);
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Parsowanie tresci
+	 *
+	 * @since 1.0
+	 *
+	 * @param  string $content
+	 * @return string
+	 */
+	public function filterTheContent($content)
+	{
+
+		// Nie jest postem
+		if (!is_single()) {
+			return $content;
+		}
+
+		return preg_replace_callback(
+			'#(?P<open><[a-z]+[^>]*>)? *(?P<more><span id="more-[0-9]+"></span>) *(?P<close></[a-z]+>)?()#i',
+			array($this, 'filterTheContentCallback'),
+			$content
+		);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Funkcja pomocnicza dla parsowania tresci
+	 *
+	 * @since 1.0
+	 *
+	 * @param  array  $m
+	 * @return string
+	 */
+	protected function filterTheContentCallback($m)
+	{
+
+		$options = $this->getOptions();
+		if (!$options['code']) {
+			return $m[0];
+		}
+
+		$title = $options['title'] ? '<div class="master-post-advert-title">'.$options['title'].'</div>' : '';
+		$ad = <<<EOA
+<div class="master-post-advert" style="text-align: {$options['align']}; margin: 25px 0; overflow: hidden;">
+	<div style="text-align: left; display: inline-block; max-width: 100%;">
+		{$title}
+		<div class="master-post-advert-ad">{$options['code']}</div>
+	</div>
+</div>
+EOA;
+
+		if ($m['open'] && $m['close']) {
+			return "{$ad}\n{$m[0]}";
+		} else if ($m['open']) {
+			return "{$ad}\n{$m['open']}{$m['more']}";
+		} else if ($m['close']) {
+			return "{$m['more']}{$m['close']}\n{$ad}";
+		} else {
+			return "\n{$ad}\n{$m['more']}";
+		}
+
+	}
+
 }
 
 // -----------------------------------------------------------------------------
 
+function master_post_advert_init() {
+	new MasterPostAdvert();
+}
 add_action('init', 'master_post_advert_init');
